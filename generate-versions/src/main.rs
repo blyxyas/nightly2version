@@ -1,14 +1,10 @@
 use anyhow::Result;
 use git2::{self, Repository};
 use std::{
-    fmt::write,
-    fs::{File, OpenOptions},
-    io::Write,
-    path::Path,
-    process::Command,
-    str::FromStr,
+    fmt::write, fs::{File, OpenOptions}, io::Write, path::Path, process::Command, str::FromStr
 };
 use version::Version;
+
 
 // I KNOW THIS IS A MESS
 fn main() -> Result<()> {
@@ -42,9 +38,8 @@ fn main() -> Result<()> {
             _ => return true,
         };
 
-        let find_commit_time = repo.find_tag(oid).unwrap().tagger().unwrap().when();
-
         if version_parse.patch != 0 {
+            let find_commit_time = repo.find_tag(oid).unwrap().tagger().unwrap().when();
             arms.push(format!(
                 "{} if patch == {} => {{Ok({})}},",
                 version_parse.minor,
@@ -52,6 +47,7 @@ fn main() -> Result<()> {
                 find_commit_time.seconds()
             ));
         } else {
+            let find_commit_time = repo.find_tag(oid).unwrap().tagger().unwrap().when();
             arms.push(format!(
                 "{} => {{Ok({})}},",
                 version_parse.minor,
@@ -109,13 +105,9 @@ fn main() -> Result<()> {
         "_ => anyhow::bail!(\"Version {{}}.{{}}not found\", minor, patch)"
     )
     .unwrap();
-
     writeln!(generated_rs, "}} }}").unwrap();
-
-    writeln!(
-        generated_rs,
-        "#[inline]\npub(crate) fn version_exists(minor: u16) -> bool {{\nmatch minor {{\n"
-    )?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn version_exists(minor: u16, patch: u16) -> bool {{\nmatch minor {{\n")?;
+    
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -126,12 +118,18 @@ fn main() -> Result<()> {
             Ok(s) if s.minor != 0 => s,
             _ => return true,
         };
-        arms.push(format!(" | {}", version_parse.minor));
+
+            arms.push(format!(
+                "{} if patch == {} => true,",
+                version_parse.minor,
+                version_parse.patch,
+            ));
+
         true
     })?;
     arms.reverse();
     arms.dedup();
-    arms.push("=> true,\n_ => false".into());
+    arms.push("_ => false".into());
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     writeln!(generated_rs, "}} }}").unwrap();
 

@@ -3,6 +3,7 @@
 #![feature(let_chains)]
 
 use core::str;
+use std::ops::Not;
 
 use anyhow::Result;
 pub use chrono::DateTime;
@@ -89,10 +90,13 @@ impl ToVersion for &[u8] {
 // const fn to_version(a: &str) {
 // }
 
-struct RustVersion {
-    major: u16,
-    minor: u16,
-    patch: u16,
+pub struct RustVersion {
+    /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH)
+    pub major: u16,
+    /// The MINOR number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.**MINOR**.PATCH)
+    pub minor: u16,
+    /// The PATCH number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.MINOR.**PATCH**)
+    pub patch: u16,
 }
 
 impl RustVersion {
@@ -105,7 +109,7 @@ impl RustVersion {
         }
     }
 
-    pub fn to_timestamp<V: ToVersion>(&self) -> Result<i64> {
+    pub fn to_timestamp(&self) -> Result<i64> {
         if core::intrinsics::unlikely(self.major == 0) {
             unimplemented!("Betas (< 1.0.0) are not supported versions for now");
         }
@@ -118,19 +122,20 @@ impl RustVersion {
     // }
 
     #[inline]
-    pub fn to_commit_id<V: ToVersion>(&self) -> Result<&'static str> {
-        let version = version.to_version();
-        generated::correlations_commits(version.1, version.2)
+    pub fn to_commit_id(&self) -> Result<&'static str> {
+        let version = self;
+        generated::correlations_commits(version.minor, version.patch)
     }
 
     pub fn exists(&self) -> bool {
-        generated::exists(minor, patch);
+        generated::version_exists(self.minor, self.patch)
     }
 }
 
 #[test]
 fn test() {
-    dbg!("1.80.0".to_version());
+    assert!(RustVersion::new("1.80.1").exists().not());
+    assert!(RustVersion::new("1.80.0").exists());
 }
 
 // #[cfg(feature = "version_crate")]
