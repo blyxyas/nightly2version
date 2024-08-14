@@ -1,17 +1,14 @@
 use anyhow::Result;
 use git2::{self, Oid, Repository, Time};
 use std::{
-    collections::HashMap,
-    fmt::write,
-    fs::{File, OpenOptions},
-    io::Write,
-    path::Path,
-    process::Command,
-    str::FromStr,
+    collections::HashMap, fs::OpenOptions, io::Write, path::Path, process::Command, str::FromStr,
 };
 use version::Version;
 
 // I KNOW THIS IS A MESS
+// THIS MAY BE THE WORST CODE EVER CONCEIVED BY ANY HUMAN EVER
+// IF YOURE A CONTRIBUTOR DONT EVEN TRY TO LOOK AT THIS, IT *JUST WORKS*
+// SO WHY BOTHER, IM "COMMITTING" (haha) SEVERAL DEADLY SINS HERE
 fn main() -> Result<()> {
     let rust_path = Path::new("rust");
     let repo;
@@ -78,7 +75,7 @@ fn main() -> Result<()> {
 
     // COMMITS
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_commits(minor: u16, patch: u16) -> anyhow::Result<&'static str> {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_commits(major: u16, minor: u16, patch: u16) -> anyhow::Result<&'static str> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -90,17 +87,25 @@ fn main() -> Result<()> {
             _ => return true,
         };
 
+        let mut meow = String::new();
         if version_parse.patch != 0 {
-            arms.push(format!(
-                "{} if patch == {} => {{Ok(\"{}\")}},",
-                version_parse.minor,
-                version_parse.patch,
-                oid.to_string()
-            ));
+            meow.push_str(&format!("if patch == {}", version_parse.patch))
+        }
+        if version_parse.major == 0 {
+            arms.insert(
+                0,
+                format!(
+                    "{} if major == 0 => {{Ok(\"{}\")}},",
+                    version_parse.minor,
+                    // Meow not necessary
+                    oid.to_string()
+                ),
+            );
         } else {
             arms.push(format!(
-                "{} => {{Ok(\"{}\")}},",
+                "{} {} => {{Ok(\"{}\")}},",
                 version_parse.minor,
+                meow,
                 oid.to_string()
             ));
         }
@@ -146,7 +151,7 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "}} }}").unwrap();
     arms.clear();
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {{\nmatch timestamp {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {{\nmatch timestamp - 1 {{\n")?;
 
     let mut hashmap = HashMap::new();
 
@@ -189,10 +194,10 @@ fn main() -> Result<()> {
 
     let mut timesvec = hashmap.into_iter().collect::<Vec<((u32, u32, u32), i64)>>();
     timesvec.sort_by(|x, y| {
-        x.0 .1
-            .cmp(&y.0 .1)
+        x.0 .0
+            .cmp(&y.0 .0)
+            .then(x.0 .1.cmp(&y.0 .1))
             .then(x.0 .2.cmp(&y.0 .2))
-            .then(x.0 .0.cmp(&y.0 .0))
     });
 
     // For the first one
@@ -211,6 +216,7 @@ fn main() -> Result<()> {
 
         last_ts = timestamp;
     }
+    arms.reverse();
     arms.push("_ => anyhow::bail!(\"Timestamp is not a version's release date, maybe it is the current version?\")".into());
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     writeln!(generated_rs, "}} }}").unwrap();

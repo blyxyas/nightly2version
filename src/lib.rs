@@ -93,6 +93,7 @@ impl ToVersion for &[u8] {
 // const fn to_version(a: &str) {
 // }
 
+#[derive(PartialEq, Debug)]
 pub struct RustVersion {
     /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH)
     pub major: u16,
@@ -103,6 +104,7 @@ pub struct RustVersion {
 }
 
 impl RustVersion {
+    #[inline]
     pub fn new<V: ToVersion>(version: V) -> Self {
         let (major, minor, patch) = version.to_version();
         Self {
@@ -120,14 +122,19 @@ impl RustVersion {
         generated::correlations_dates(self.minor, 0)
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn to_commit_id(&self) -> Result<&'static str> {
-        let version = self;
-        generated::correlations_commits(version.minor, version.patch)
+        generated::correlations_commits(self.major, self.minor, self.patch)
     }
 
+    #[inline(always)]
     pub fn exists(&self) -> bool {
         generated::version_exists(self.minor, self.patch)
+    }
+
+    #[inline]
+    pub fn timestamp_to_version(timestamp: i64) -> Result<Self> {
+        Ok(Self::new(generated::timestamp_ranges(timestamp)?))
     }
 }
 
@@ -135,6 +142,17 @@ impl RustVersion {
 fn test() {
     assert!(RustVersion::new("1.80.1").exists().not());
     assert!(RustVersion::new("1.80.0").exists());
+    
+    let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
+    assert_eq!(timestamp, 1721908957);
+    
+    let version = RustVersion::timestamp_to_version(timestamp - 10).unwrap();
+    assert!(version.exists());
+    assert_eq!(version, RustVersion {
+        major: 1,
+        minor: 80,
+        patch: 0
+    });
 }
 
 // #[cfg(feature = "version_crate")]
