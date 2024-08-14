@@ -1,9 +1,11 @@
 #![allow(internal_features)]
 #![feature(core_intrinsics)]
 #![feature(let_chains)]
+// #[cfg(not(feature = "std"))]
+#![cfg_attr(not(feature = "std"), no_std)]
 
+use core::ops::Not;
 use core::str;
-use std::ops::Not;
 
 use anyhow::Result;
 mod generated;
@@ -62,7 +64,8 @@ impl ToVersion for (u16, u16, u16) {
     }
 }
 
-impl ToVersion for String {
+#[cfg(feature = "std")]
+impl ToVersion for std::string::String {
     #[inline(always)]
     fn to_version(&self) -> (u16, u16, u16) {
         self.as_str().to_version()
@@ -76,12 +79,12 @@ impl ToVersion for String {
 impl ToVersion for &[u8] {
     #[inline]
     fn to_version(&self) -> (u16, u16, u16) {
-        std::str::from_utf8(self)
+        core::str::from_utf8(self)
             .expect("Couldn't create String from")
             .to_version()
     }
     fn is_valid_version(&self) -> bool {
-        std::str::from_utf8(self)
+        core::str::from_utf8(self)
             .expect("Couldn't create String from")
             .is_valid_version()
     }
@@ -135,21 +138,28 @@ impl RustVersion {
     }
 }
 
-#[test]
-fn test() {
-    assert!(RustVersion::new("1.80.1").exists().not());
-    assert!(RustVersion::new("1.80.0").exists());
-    
-    let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
-    assert_eq!(timestamp, 1721908957);
-    
-    let version = RustVersion::timestamp_to_version(timestamp - 10).unwrap();
-    assert!(version.exists());
-    assert_eq!(version, RustVersion {
-        major: 1,
-        minor: 80,
-        patch: 0
-    });
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    #[test]
+    fn test() {
+        assert!(RustVersion::new("1.80.1").exists().not());
+        assert!(RustVersion::new("1.80.0").exists());
+
+        let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
+        assert_eq!(timestamp, 1721908957);
+
+        let version = RustVersion::timestamp_to_version(timestamp - 10).unwrap();
+        assert!(version.exists());
+        assert_eq!(
+            version,
+            RustVersion {
+                major: 1,
+                minor: 80,
+                patch: 0
+            }
+        );
+    }
 }
 
 // #[cfg(feature = "version_crate")]
