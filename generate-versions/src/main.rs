@@ -1,5 +1,5 @@
 use anyhow::Result;
-use git2::{self, Oid, Repository, Time};
+use git2::{self, Repository};
 use std::{
     collections::HashMap, fs::OpenOptions, io::Write, path::Path, process::Command, str::FromStr,
 };
@@ -33,7 +33,8 @@ fn main() -> Result<()> {
 
     // TIMESTAMP
 
-    generated_rs.write_all(b"#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {\nmatch minor {\n")?;
+    generated_rs.write_all(b"#![allow(unreachable_patterns)]").unwrap();
+    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -126,7 +127,7 @@ fn main() -> Result<()> {
 
     writeln!(generated_rs, "#[inline]\npub(crate) fn version_exists(minor: u16, patch: u16) -> bool {{\nmatch minor {{\n")?;
 
-    repo.tag_foreach(|oid, bnames| {
+    repo.tag_foreach(|_, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
         if tag.split('.').count() != 3 {
             return true;

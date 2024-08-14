@@ -2,6 +2,14 @@
 name = "nightly2version"
 version = "1.80.0"
 edition = "2021"
+description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
+
+homepage = "https://github.com/rust-lang/rust-clippy"
+repository = "https://github.com/rust-lang/rust-clippy"
+readme = "README.md"
+license-file = "LICENSE"
+keywords = ["version", "nightly", "rust"]
+categories = ["date-and-time", "no-std", "rust-patterns", ""]
 
 [dependencies]
 anyhow = "1.0.86"

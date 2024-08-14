@@ -6,7 +6,6 @@
 // #[cfg(not(feature = "std"))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use core::ops::Not;
 use core::str;
 
 use anyhow::Result;

@@ -1,3 +1,4 @@
+#![allow(unreachable_patterns)]
 #[inline]
 pub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {
     match minor {
