@@ -203,7 +203,7 @@ fn main() -> Result<()> {
     // For the first one
     arms.push(format!(
         "..{} => Ok(({}, {}, {})),",
-        timesvec[0].1, timesvec[0].0 .0, timesvec[0].0 .1, timesvec[0].0 .1,
+        timesvec[0].1, timesvec[0].0 .0, timesvec[0].0 .1, timesvec[0].0 .2,
     ));
 
     let mut last_ts = &timesvec[0].1;

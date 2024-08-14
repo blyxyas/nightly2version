@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 #![allow(internal_features)]
 #![feature(core_intrinsics)]
 #![feature(let_chains)]
@@ -149,7 +151,7 @@ mod tests {
         let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
         assert_eq!(timestamp, 1721908957);
 
-        let version = RustVersion::timestamp_to_version(timestamp - 10).unwrap();
+        let version = RustVersion::timestamp_to_version(timestamp).unwrap();
         assert!(version.exists());
         assert_eq!(
             version,
