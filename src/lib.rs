@@ -6,9 +6,6 @@ use core::str;
 use std::ops::Not;
 
 use anyhow::Result;
-pub use chrono::DateTime;
-use chrono::{NaiveDate, TimeZone};
-
 mod generated;
 
 pub trait ToVersion {
