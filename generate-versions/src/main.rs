@@ -18,6 +18,8 @@ fn main() -> Result<()> {
         repo = Repository::open(rust_path)?;
     }
 
+    repo.find_remote("origin")?.fetch(&["master"], None, None)?;
+
     let mut generated_rs = OpenOptions::new()
         .write(true)
         .append(true)
@@ -92,15 +94,12 @@ fn main() -> Result<()> {
             meow.push_str(&format!("if patch == {}", version_parse.patch))
         }
         if version_parse.major == 0 {
-            arms.insert(
-                0,
-                format!(
+            writeln!(generated_rs, 
                     "{} if major == 0 => {{Ok(\"{}\")}},",
                     version_parse.minor,
                     // Meow not necessary
                     oid.to_string()
-                ),
-            );
+            ).unwrap();
         } else {
             arms.push(format!(
                 "{} {} => {{Ok(\"{}\")}},",

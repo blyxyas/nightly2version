@@ -126,6 +126,8 @@ pub(crate) fn correlations_commits(
     patch: u16,
 ) -> anyhow::Result<&'static str> {
     match minor {
+        11 if major == 0 => Ok("e1247cb1d0d681be034adb4b558b5a0c0d5720f9"),
+        12 if major == 0 => Ok("f0c419429ef30723ceaf6b42f9b5a2aeb5d2e2d1"),
         9 => Ok("6f9526945c2b832c0eb2187964ecd68f6ab0f600"),
         80 => Ok("4f9c8cbf2386b5e35c5ba754b705c383c5f4b4cc"),
         8 => Ok("6bef00072dbaa86da9dc73b09f926cf67c696b39"),
@@ -238,8 +240,6 @@ pub(crate) fn correlations_commits(
         11 => Ok("f63a9c0cde3e69f0e283dd7dcd710a79a6869dee"),
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
-        11 if major == 0 => Ok("e1247cb1d0d681be034adb4b558b5a0c0d5720f9"),
-        12 if major == 0 => Ok("f0c419429ef30723ceaf6b42f9b5a2aeb5d2e2d1"),
         _ => anyhow::bail!("Version {}.{}not found", minor, patch),
     }
 }
@@ -479,7 +479,7 @@ pub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)
         1435253745..1438966327 => Ok((1, 2, 0)),
         1412872439..1435253745 => Ok((1, 1, 0)),
         1404324205..1412872439 => Ok((0, 12, 0)),
-        ..1404324205 => Ok((0, 11, 11)),
+        ..1404324205 => Ok((0, 11, 0)),
         _ => anyhow::bail!(
             "Timestamp is not a version's release date, maybe it is the current version?"
         ),
