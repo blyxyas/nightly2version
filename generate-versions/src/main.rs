@@ -33,7 +33,9 @@ fn main() -> Result<()> {
 
     // TIMESTAMP
 
-    generated_rs.write_all(b"#![allow(unreachable_patterns)]").unwrap();
+    generated_rs
+        .write_all(b"#![allow(unreachable_patterns)]")
+        .unwrap();
     writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
@@ -95,12 +97,14 @@ fn main() -> Result<()> {
             meow.push_str(&format!("if patch == {}", version_parse.patch))
         }
         if version_parse.major == 0 {
-            writeln!(generated_rs, 
-                    "{} if major == 0 => {{Ok(\"{}\")}},",
-                    version_parse.minor,
-                    // Meow not necessary
-                    oid.to_string()
-            ).unwrap();
+            writeln!(
+                generated_rs,
+                "{} if major == 0 => {{Ok(\"{}\")}},",
+                version_parse.minor,
+                // Meow not necessary
+                oid.to_string()
+            )
+            .unwrap();
         } else {
             arms.push(format!(
                 "{} {} => {{Ok(\"{}\")}},",
@@ -127,6 +131,7 @@ fn main() -> Result<()> {
 
     writeln!(generated_rs, "#[inline]\npub(crate) fn version_exists(minor: u16, patch: u16) -> bool {{\nmatch minor {{\n")?;
 
+    let mut how_many = 0;
     repo.tag_foreach(|_, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
         if tag.split('.').count() != 3 {
@@ -137,6 +142,7 @@ fn main() -> Result<()> {
             _ => return true,
         };
 
+        how_many += 1;
         arms.push(format!(
             "{} if patch == {} => true,",
             version_parse.minor, version_parse.patch,
@@ -150,6 +156,62 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     writeln!(generated_rs, "}} }}").unwrap();
     arms.clear();
+
+    // VERSIONS ARRAY
+
+    writeln!(
+        generated_rs,
+        "#[inline]\npub(crate) fn all_versions() -> [((u16, u16, u16), i64);{how_many}] {{\n["
+    )?;
+
+    let mut meowmeowvec: Vec<((u32, u32, u32), i64)> = Vec::new();
+
+    repo.tag_foreach(|oid, bnames| {
+        let tag = std::str::from_utf8(&bnames[10..]).unwrap();
+        if tag.split('.').count() != 3 {
+            return true;
+        }
+
+        let version_parse = match Version::from_str(tag) {
+            Ok(s) if s.minor != 0 => s,
+            _ => return true,
+        };
+
+        let find_commit_time = match repo.find_tag(oid) {
+            Ok(t) => t.tagger().unwrap().when(),
+            _ => return true,
+        };
+
+        meowmeowvec.push((
+            (
+                version_parse.major,
+                version_parse.minor,
+                version_parse.patch,
+            ),
+            find_commit_time.seconds(),
+        ));
+
+        true
+    })?;
+
+    meowmeowvec.sort_by(|x, y| {
+        x.0 .0
+            .cmp(&y.0 .0)
+            .then(x.0 .1.cmp(&y.0 .1))
+            .then(x.0 .2.cmp(&y.0 .2))
+    });
+
+    meowmeowvec
+        .iter()
+        .for_each(|m| arms.push(format!("(({}, {}, {}), {})", m.0 .0, m.0 .1, m.0 .2, m.1)));
+
+    arms.reverse();
+    arms.dedup();
+    writeln!(generated_rs, "{}", arms.join("\n,")).unwrap();
+    writeln!(generated_rs, "] }}").unwrap();
+    arms.clear();
+
+    // HASHMAP RANGES
 
     writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {{\nmatch timestamp - 1 {{\n")?;
 

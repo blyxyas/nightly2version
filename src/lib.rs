@@ -1,9 +1,7 @@
 #![doc = include_str!("../README.md")]
-
 #![allow(internal_features)]
 #![feature(core_intrinsics)]
 #![feature(let_chains)]
-// #[cfg(not(feature = "std"))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use core::str;
@@ -12,7 +10,12 @@ use anyhow::Result;
 mod generated;
 
 pub trait ToVersion {
+    /// Returns the parsed version of the input without taking the input. The
+    /// return type `(u16, u16, u16)` is formatted like `(MAJOR, MINOR, PATCH)`.
     fn to_version(&self) -> (u16, u16, u16);
+    /// Validates if a string would be a valid version. This method does not
+    /// check if the version exists, checkout [`RustVersion`] for checking
+    /// if a version exists.
     fn is_valid_version(&self) -> bool;
 }
 
@@ -91,16 +94,13 @@ impl ToVersion for &[u8] {
     }
 }
 
-// const fn to_version(a: &str) {
-// }
-
 #[derive(PartialEq, Debug)]
 pub struct RustVersion {
-    /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH)
+    /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH).
     pub major: u16,
-    /// The MINOR number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.**MINOR**.PATCH)
+    /// The MINOR number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.**MINOR**.PATCH).
     pub minor: u16,
-    /// The PATCH number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.MINOR.**PATCH**)
+    /// The PATCH number in [SemVer snytax](https://semver.org/) (e.g. MAJOR.MINOR.**PATCH**).
     pub patch: u16,
 }
 
@@ -115,6 +115,7 @@ impl RustVersion {
         }
     }
 
+    /// Returns the associated timestamp with the version. This is done by getting what commit.
     pub fn to_timestamp(&self) -> Result<i64> {
         if core::intrinsics::unlikely(self.major == 0) {
             unimplemented!("Betas (< 1.0.0) are not supported versions for now");
@@ -123,35 +124,81 @@ impl RustVersion {
         generated::correlations_dates(self.minor, 0)
     }
 
+    /// Returns the commit id for the Rust Version, if it exists. Returns an
+    /// error if it doesn't exist (likely because the version doesn't exist,
+    /// or these isn't a commit tagged as the release; unlikely).
     #[inline(always)]
     pub fn to_commit_id(&self) -> Result<&'static str> {
         generated::correlations_commits(self.major, self.minor, self.patch)
     }
 
     #[inline(always)]
-    pub fn exists(&self) -> bool {
+    /// Returns true if the version has ever been been declared.
+    /// For example, the version 1.77.2 would return `true` while the version
+    /// 1.77.9 would return `false`, because there never was a version 1.77.9.
+    ///
+    /// Note that the nightly or beta version would output `false`, as it's not in stable yet.
+    ///
+    /// ```rust
+    /// # fn main() {
+    /// # use nightly2version::RustVersion;
+    /// assert_eq!(RustVersion::new("1.77.2").exists_in_stable(), true);
+    /// assert_eq!(RustVersion::new("1.101.9000").exists_in_stable(), false)
+    /// # }
+    /// ```
+    pub fn exists_in_stable(&self) -> bool {
         generated::version_exists(self.minor, self.patch)
     }
 
+    /// Converts a timestamp to a version. This method can return a
+    /// [`RustVersion`] up to two MINOR versions highers than the current
+    /// stable one to account for beta and nightly versions.
     #[inline]
     pub fn timestamp_to_version(timestamp: i64) -> Result<Self> {
-        Ok(Self::new(generated::timestamp_ranges(timestamp)?))
+        match generated::timestamp_ranges(timestamp) {
+            Ok(s) => Ok(RustVersion::new(s.to_version())),
+            Err(e) => {
+                // Calculate nightly
+                let latest = generated::all_versions()[0];
+                // Check if three weeks ago we were stable
+                if timestamp - (60 * 60 * 24 * 21) <= latest.1 {
+                    // We're in beta
+                    return Ok(RustVersion {
+                        major: latest.0 .0,
+                        minor: latest.0 .1 + 1,
+                        patch: latest.0 .2,
+                    });
+                } else if timestamp - (60 * 60 * 24 * 42) <= latest.1 {
+                    // Were we 6 weeks ago or more recently?
+                    // Then we're in nightly
+                    return Ok(RustVersion {
+                        major: latest.0 .0,
+                        minor: latest.0 .1 + 2,
+                        patch: latest.0 .2,
+                    });
+                }
+
+                Err(e)
+            }
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use core::ops::Not;
+
     use crate::*;
     #[test]
     fn test() {
-        assert!(RustVersion::new("1.80.1").exists().not());
-        assert!(RustVersion::new("1.80.0").exists());
+        assert!(RustVersion::new("1.80.1").exists_in_stable().not());
+        assert!(RustVersion::new("1.80.0").exists_in_stable());
 
         let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
         assert_eq!(timestamp, 1721908957);
 
         let version = RustVersion::timestamp_to_version(timestamp).unwrap();
-        assert!(version.exists());
+        assert!(version.exists_in_stable());
         assert_eq!(
             version,
             RustVersion {
@@ -162,6 +209,3 @@ mod tests {
         );
     }
 }
-
-// #[cfg(feature = "version_crate")]
-// impl From<Version> for
