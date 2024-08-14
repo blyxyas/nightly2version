@@ -46,7 +46,10 @@ impl ToVersion for &str {
     fn is_valid_version(&self) -> bool {
         let mut splits = self.split('.')/*.collect::<Vec<&str>>()*/;
         let mut count = 0;
-        splits.all(|s| { count +=1; s.chars().all(|c| c.is_digit(10))}) && count == 3
+        splits.all(|s| {
+            count += 1;
+            s.chars().all(|c| c.is_digit(10))
+        }) && count == 3
     }
 }
 
@@ -105,7 +108,7 @@ impl RustVersion {
         Self {
             major,
             minor,
-            patch
+            patch,
         }
     }
 
@@ -116,10 +119,6 @@ impl RustVersion {
 
         generated::correlations_dates(self.minor, 0)
     }
-
-    // pub fn version_to_nightly<V: ToVersion>(version: V) -> Result<NaiveDate> {
-    //     Ok()
-    // }
 
     #[inline]
     pub fn to_commit_id(&self) -> Result<&'static str> {
