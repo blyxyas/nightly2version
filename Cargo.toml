@@ -9,7 +9,7 @@ repository = "https://github.com/rust-lang/rust-clippy"
 readme = "README.md"
 license-file = "LICENSE"
 keywords = ["version", "nightly", "rust"]
-categories = ["date-and-time", "no-std", "rust-patterns", ""]
+categories = ["date-and-time", "no-std", "rust-patterns"]
 
 [dependencies]
 anyhow = "1.0.86"
