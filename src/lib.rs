@@ -4,7 +4,10 @@
 #![feature(let_chains)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use core::{cmp::{self, Ordering}, fmt, str};
+use core::{
+    cmp::{self, Ordering},
+    fmt, str,
+};
 
 use anyhow::Result;
 mod generated;
@@ -198,9 +201,11 @@ impl cmp::PartialOrd for RustVersion {
 
 impl cmp::Ord for RustVersion {
     fn cmp(&self, other: &Self) -> cmp::Ordering {
-        self.major.cmp(&other.major)
-            .then(self.minor.cmp(&other.minor)
-        .then(self.patch.cmp(&other.patch)))
+        self.major.cmp(&other.major).then(
+            self.minor
+                .cmp(&other.minor)
+                .then(self.patch.cmp(&other.patch)),
+        )
     }
 }
 
