@@ -4,7 +4,7 @@
 #![feature(let_chains)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use core::str;
+use core::{cmp::{self, Ordering}, fmt, str};
 
 use anyhow::Result;
 mod generated;
@@ -94,7 +94,7 @@ impl ToVersion for &[u8] {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct RustVersion {
     /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH).
     pub major: u16,
@@ -184,9 +184,29 @@ impl RustVersion {
     }
 }
 
+impl fmt::Display for RustVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+impl cmp::PartialOrd for RustVersion {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl cmp::Ord for RustVersion {
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
+        self.major.cmp(&other.major)
+            .then(self.minor.cmp(&other.minor)
+        .then(self.patch.cmp(&other.patch)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use core::ops::Not;
+    use ::core::ops::Not;
 
     use crate::*;
     #[test]
@@ -207,5 +227,14 @@ mod tests {
                 patch: 0
             }
         );
+    }
+
+    #[test]
+    fn impls() {
+        assert!(RustVersion::new("1.80.1") < RustVersion::new("1.81.0"));
+        assert!(RustVersion::new("1.80.1") == RustVersion::new("1.80.1"));
+        assert!(RustVersion::new("1.80.1") != RustVersion::new("1.80.9"));
+        assert!(RustVersion::new("1.80.1") != RustVersion::new("2.80.1"));
+        assert!(RustVersion::new("1.1.0") >= RustVersion::new("1.0.0"));
     }
 }
