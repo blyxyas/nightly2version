@@ -216,7 +216,7 @@ mod tests {
     use crate::*;
     #[test]
     fn test() {
-        assert!(RustVersion::new("1.80.1").exists_in_stable().not());
+        assert!(RustVersion::new("1.80.999").exists_in_stable().not());
         assert!(RustVersion::new("1.80.0").exists_in_stable());
 
         let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();

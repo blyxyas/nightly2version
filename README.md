@@ -7,7 +7,7 @@ use nightly2version::RustVersion;
 
 fn main() {
 
-    assert_eq!(RustVersion::new("1.80.1").exists_in_stable(), false); // Version does not exist
+    assert_eq!(RustVersion::new("1.80.999").exists_in_stable(), false); // Version does not exist
     assert_eq!(RustVersion::new("1.80.0").exists_in_stable(), true); // Version does exist
 
     let timestamp = RustVersion::new("1.80.0").to_timestamp().unwrap();
