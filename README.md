@@ -33,6 +33,6 @@ You can convert from a timestamp to a [`RustVersion`], change the minor, check i
 This crate doesn't follow normal crate versioning conventions. `nightly2version` gets updated on a 6-week schedule, just after Rust gets a new version. Sometimes a change in the crate gets included in that update. Compatibility is a priority and will be maintained. For new `nightly2version` versions that needs to get released before the 6-week schedule, you can find those in the last number of the version number, just after the dash.
 
 ```rust,no_compile
-   "1.80.0-1"
+   "1.80.0-1" ;
 // <RUST MAJOR>.<RUST MINOR>.<RUST PATCH>-<CRATE REVISION>
 ```

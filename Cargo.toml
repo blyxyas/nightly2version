@@ -1,6 +1,6 @@
 [package]
 name = "nightly2version"
-version = "1.80.0-1"
+version = "1.80.0-2"
 edition = "2021"
 description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
 
