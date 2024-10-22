@@ -1,7 +1,5 @@
 #![doc = include_str!("../README.md")]
 #![allow(internal_features)]
-#![feature(core_intrinsics)]
-#![feature(let_chains)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use core::{
@@ -27,11 +25,11 @@ impl ToVersion for &str {
         let mut split = self.split('.');
         // https://stackoverflow.com/questions/16826422/c-most-efficient-way-to-convert-string-to-int-faster-than-atoi
         (
-            if core::intrinsics::likely(
-                split.next().expect(
-                    "The split had length 0, are you sure you inputted a version (e.g. 1.0.0)?",
-                ) == "1",
-            ) {
+            if split
+                .next()
+                .expect("The split had length 0, are you sure you inputted a version (e.g. 1.0.0)?")
+                == "1"
+            {
                 1
             } else {
                 0
@@ -120,7 +118,7 @@ impl RustVersion {
 
     /// Returns the associated timestamp with the version. This is done by getting what commit.
     pub fn to_timestamp(&self) -> Result<i64> {
-        if core::intrinsics::unlikely(self.major == 0) {
+        if self.major == 0 {
             unimplemented!("Betas (< 1.0.0) are not supported versions for now");
         }
 
