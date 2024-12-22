@@ -118,6 +118,7 @@ pub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> 
         1 => Ok(1435253745),
         12 => Ok(1412872439),
         11 => Ok(1404324205),
+        83 => Ok(1732802513),
         82 => Ok(1729183468),
         _ => anyhow::bail!("Version {}.{}not found", minor, patch),
     }
@@ -246,6 +247,7 @@ pub(crate) fn correlations_commits(
         11 => Ok("f63a9c0cde3e69f0e283dd7dcd710a79a6869dee"),
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
+        83 => Ok("5056432f7fbd9d936f350c0d0f990ca5df1d5e20"),
         82 => Ok("6a9c384f2e78b84f43686755309c235908bbd784"),
         _ => anyhow::bail!("Version {}.{}not found", minor, patch),
     }
@@ -369,13 +371,15 @@ pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
         1 if patch == 0 => true,
         12 if patch == 0 => true,
         11 if patch == 0 => true,
+        83 if patch == 0 => true,
         82 if patch == 0 => true,
         _ => false,
     }
 }
 #[inline]
-pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 117] {
+pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 118] {
     [
+        ((1, 83, 0), 1732802513),
         ((1, 82, 0), 1729183468),
         ((1, 81, 0), 1725552388),
         ((1, 80, 1), 1723126065),
@@ -498,6 +502,7 @@ pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 117] {
 #[inline]
 pub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {
     match timestamp - 1 {
+        1729183468..1732802513 => Ok((1, 83, 0)),
         1725552388..1729183468 => Ok((1, 82, 0)),
         1723126065..1725552388 => Ok((1, 81, 0)),
         1721908957..1723126065 => Ok((1, 80, 1)),
