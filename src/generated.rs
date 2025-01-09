@@ -251,7 +251,7 @@ pub(crate) fn correlations_commits(
         84 => Ok("a7abb900ebbe7f481d2a8826fbd0718b79ca58f5"),
         83 => Ok("5056432f7fbd9d936f350c0d0f990ca5df1d5e20"),
         82 => Ok("6a9c384f2e78b84f43686755309c235908bbd784"),
-        _ => anyhow::bail!("Version {}.{}not found", minor, patch),
+        _ => anyhow::bail!("Version {}.{} not found", minor, patch),
     }
 }
 #[inline]
