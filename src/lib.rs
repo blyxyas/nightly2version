@@ -7,7 +7,6 @@ use core::{
     fmt, str,
 };
 
-use anyhow::Result;
 mod generated;
 
 pub trait ToVersion {
@@ -117,7 +116,7 @@ impl RustVersion {
     }
 
     /// Returns the associated timestamp with the version. This is done by getting what commit.
-    pub fn to_timestamp(&self) -> Result<i64> {
+    pub fn to_timestamp(&self) -> Result<i64, &'static str> {
         if self.major == 0 {
             unimplemented!("Betas (< 1.0.0) are not supported versions for now");
         }
@@ -129,7 +128,7 @@ impl RustVersion {
     /// error if it doesn't exist (likely because the version doesn't exist,
     /// or these isn't a commit tagged as the release; unlikely).
     #[inline(always)]
-    pub fn to_commit_id(&self) -> Result<&'static str> {
+    pub fn to_commit_id(&self) -> Result<&'static str, &'static str> {
         generated::correlations_commits(self.major, self.minor, self.patch)
     }
 
@@ -155,7 +154,7 @@ impl RustVersion {
     /// [`RustVersion`] up to two MINOR versions highers than the current
     /// stable one to account for beta and nightly versions.
     #[inline]
-    pub fn timestamp_to_version(timestamp: i64) -> Result<Self> {
+    pub fn timestamp_to_version(timestamp: i64) -> Result<Self, &'static str> {
         match generated::timestamp_ranges(timestamp) {
             Ok(s) => Ok(RustVersion::new(s.to_version())),
             Err(e) => {

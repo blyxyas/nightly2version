@@ -1,6 +1,6 @@
 #![allow(unreachable_patterns)]
 #[inline]
-pub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {
+pub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static str> {
     match minor {
         9 => Ok(1464280168),
         81 => Ok(1725552388),
@@ -122,7 +122,7 @@ pub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> 
         84 => Ok(1736437309),
         83 => Ok(1732802513),
         82 => Ok(1729183468),
-        _ => anyhow::bail!("Version {}.{}not found", minor, patch),
+        _ => Err("Version not found")
     }
 }
 
@@ -131,7 +131,7 @@ pub(crate) fn correlations_commits(
     major: u16,
     minor: u16,
     patch: u16,
-) -> anyhow::Result<&'static str> {
+) -> Result<&'static str, &'static str> {
     match minor {
         11 if major == 0 => Ok("e1247cb1d0d681be034adb4b558b5a0c0d5720f9"),
         12 if major == 0 => Ok("f0c419429ef30723ceaf6b42f9b5a2aeb5d2e2d1"),
@@ -253,7 +253,7 @@ pub(crate) fn correlations_commits(
         84 => Ok("a7abb900ebbe7f481d2a8826fbd0718b79ca58f5"),
         83 => Ok("5056432f7fbd9d936f350c0d0f990ca5df1d5e20"),
         82 => Ok("6a9c384f2e78b84f43686755309c235908bbd784"),
-        _ => anyhow::bail!("Version {}.{}not found", minor, patch),
+        _ => Err("Version not found"),
     }
 }
 #[inline]
@@ -508,7 +508,7 @@ pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 120] {
     ]
 }
 #[inline]
-pub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {
+pub(crate) fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {
     match timestamp - 1 {
         1736437309..1738262759 => Ok((1, 84, 1)),
         1732802513..1736437309 => Ok((1, 84, 0)),
@@ -630,8 +630,6 @@ pub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)
         1412872439..1435253745 => Ok((1, 1, 0)),
         1404324205..1412872439 => Ok((0, 12, 0)),
         ..1404324205 => Ok((0, 11, 0)),
-        _ => anyhow::bail!(
-            "Timestamp is not a version's release date, maybe it is the current version?"
-        ),
+        _ => Err("Timestamp is not a version's release date, maybe it is the current version?"),
     }
 }
