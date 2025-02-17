@@ -122,7 +122,7 @@ pub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static
         84 => Ok(1736437309),
         83 => Ok(1732802513),
         82 => Ok(1729183468),
-        _ => Err("Version not found")
+        _ => Err("Version not found"),
     }
 }
 

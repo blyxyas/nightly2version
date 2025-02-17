@@ -36,7 +36,7 @@ fn main() -> Result<()> {
     generated_rs
         .write_all(b"#![allow(unreachable_patterns)]")
         .unwrap();
-    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> anyhow::Result<i64> {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static str> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -71,16 +71,12 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     arms.clear();
 
-    writeln!(
-        generated_rs,
-        "_ => anyhow::bail!(\"Version {{}}.{{}}not found\", minor, patch)"
-    )
-    .unwrap();
+    writeln!(generated_rs, "_ => Err(\"Version not found\")").unwrap();
     writeln!(generated_rs, "}} }}\n").unwrap();
 
     // COMMITS
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_commits(major: u16, minor: u16, patch: u16) -> anyhow::Result<&'static str> {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_commits(major: u16, minor: u16, patch: u16) -> Result<&'static str, &'static str> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -120,11 +116,7 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     arms.clear();
 
-    writeln!(
-        generated_rs,
-        "_ => anyhow::bail!(\"Version {{}}.{{}}not found\", minor, patch)"
-    )
-    .unwrap();
+    writeln!(generated_rs, "_ => Err(\"Version not found\")").unwrap();
     writeln!(generated_rs, "}} }}").unwrap();
 
     // VERSIONS EXIST
@@ -213,7 +205,7 @@ fn main() -> Result<()> {
 
     // HASHMAP RANGES
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> anyhow::Result<(u16, u16, u16)> {{\nmatch timestamp - 1 {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {{\nmatch timestamp - 1 {{\n")?;
 
     let mut hashmap = HashMap::new();
 
@@ -279,7 +271,10 @@ fn main() -> Result<()> {
         last_ts = timestamp;
     }
     arms.reverse();
-    arms.push("_ => anyhow::bail!(\"Timestamp is not a version's release date, maybe it is the current version?\")".into());
+    arms.push(
+        "_ => Err(\"Timestamp is not a version's release date, maybe it is the current version?\")"
+            .into(),
+    );
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     writeln!(generated_rs, "}} }}").unwrap();
 
