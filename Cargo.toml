@@ -1,8 +1,9 @@
 [package]
 name = "nightly2version"
-version = "1.85.0"
+version = "1.85.1"
 edition = "2021"
 description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
+license = "MPL-2.0"
 
 homepage = "https://github.com/rust-lang/rust-clippy"
 repository = "https://github.com/rust-lang/rust-clippy"
