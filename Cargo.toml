@@ -8,7 +8,6 @@ license = "MPL-2.0"
 homepage = "https://github.com/rust-lang/rust-clippy"
 repository = "https://github.com/rust-lang/rust-clippy"
 readme = "README.md"
-license-file = "LICENSE"
 keywords = ["version", "nightly", "rust"]
 categories = ["date-and-time", "no-std", "rust-patterns"]
 
