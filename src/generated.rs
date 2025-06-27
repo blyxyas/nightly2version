@@ -119,6 +119,7 @@ pub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static
         12 => Ok(1412872439),
         11 => Ok(1404324205),
         88 => Ok(1750961413),
+        87 => Ok(1747330093),
         86 => Ok(1743673352),
         85 if patch == 1 => Ok(1742319689),
         85 => Ok(1740071365),
@@ -254,6 +255,7 @@ pub(crate) fn correlations_commits(
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
         88 => Ok("28f5c58846af69ce1a13e529312404f11fcdea49"),
+        87 => Ok("a9edcdbe65eaccae242ec93e5831da9b826756b1"),
         86 => Ok("c8496d7e31c236266bbf00b10d40234abbed55eb"),
         85 if patch == 1 => Ok("0035dbbca59afecf0b4e53d96d61e00680dca9de"),
         85 => Ok("ebfd33271586f0dd1bc6fe1016a0c38aae31f88b"),
@@ -384,6 +386,7 @@ pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
         12 if patch == 0 => true,
         11 if patch == 0 => true,
         88 if patch == 0 => true,
+        87 if patch == 0 => true,
         86 if patch == 0 => true,
         85 if patch == 1 => true,
         85 if patch == 0 => true,
@@ -395,9 +398,10 @@ pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
     }
 }
 #[inline]
-pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 124] {
+pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 125] {
     [
         ((1, 88, 0), 1750961413),
+        ((1, 87, 0), 1747330093),
         ((1, 86, 0), 1743673352),
         ((1, 85, 1), 1742319689),
         ((1, 85, 0), 1740071365),
@@ -526,7 +530,8 @@ pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 124] {
 #[inline]
 pub(crate) fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {
     match timestamp - 1 {
-        1743673352..1750961413 => Ok((1, 88, 0)),
+        1747330093..1750961413 => Ok((1, 88, 0)),
+        1743673352..1747330093 => Ok((1, 87, 0)),
         1742319689..1743673352 => Ok((1, 86, 0)),
         1740071365..1742319689 => Ok((1, 85, 1)),
         1738262759..1740071365 => Ok((1, 85, 0)),
