@@ -94,6 +94,15 @@ impl ToVersion for &[u8] {
     }
 }
 
+// FIXME: Remember to change that `125` to 126 when the next version comes around.
+/// Return an static array of length `125` with the type structure `((MAJOR, MINOR, PATCH),
+/// timestamp)`
+///
+/// As always, the timestamp is in `i64` and starts from the [Unix Epoch](https://doc.rust-lang.org/stable/std/time/constant.UNIX_EPOCH.html)
+pub fn all_versions() -> [((u16, u16, u16), i64); 125] {
+    generated::all_versions()
+}
+
 #[derive(PartialEq, Eq, Debug)]
 pub struct RustVersion {
     /// The MAJOR number in [SemVer snytax](https://semver.org/) (e.g. **MAJOR**.MINOR.PATCH).

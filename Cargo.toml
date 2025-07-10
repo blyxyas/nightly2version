@@ -1,7 +1,7 @@
 [package]
 name = "nightly2version"
-version = "1.87.0"
-edition = "2021"
+version = "1.88.0-1"
+edition = "2018"
 description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
 license = "MPL-2.0"
 
