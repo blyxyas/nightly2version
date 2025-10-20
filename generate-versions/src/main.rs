@@ -18,7 +18,7 @@ fn main() -> Result<()> {
         repo = Repository::open(rust_path)?;
     }
 
-    repo.find_remote("origin")?.fetch(&["master"], None, None)?;
+    repo.find_remote("origin")?.fetch(&["HEAD"], None, None)?;
 
     let mut generated_rs = OpenOptions::new()
         .write(true)
