@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     }
 
     repo.find_remote("origin")?.fetch(&["HEAD"], None, None)?;
-
+dbg!("@");
     let mut generated_rs = OpenOptions::new()
         .write(true)
         .append(true)
@@ -66,7 +66,7 @@ fn main() -> Result<()> {
         }
         true
     })?;
-
+dbg!("##");
     arms.reverse();
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     arms.clear();
@@ -112,6 +112,8 @@ fn main() -> Result<()> {
         true
     })?;
 
+	dbg!("##");
+
     arms.reverse();
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     arms.clear();
@@ -148,6 +150,7 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "{}", arms.join("\n")).unwrap();
     writeln!(generated_rs, "}} }}").unwrap();
     arms.clear();
+	dbg!("##");
 
     // VERSIONS ARRAY
 
@@ -262,7 +265,10 @@ fn main() -> Result<()> {
 
     let mut last_ts = &timesvec[0].1;
 
+    let mut biggest_minor = 0;
+
     for (version, timestamp) in &timesvec[1..] {
+        if biggest_minor < version.1 { biggest_minor = version.1 };
         arms.push(format!(
             "{}..{} => Ok(({}, {}, {})),",
             last_ts, timestamp, version.0, version.1, version.2,
@@ -279,6 +285,32 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "}} }}").unwrap();
 
     format_with_fmt()?;
+
+    if Command::new("git").args(&["diff", "--exit-code"]).status().unwrap().code().unwrap() != 0 {
+	std::fs::write("/home/alex/git/nightly2version/Cargo.toml", format!(r#"[package]
+name = "nightly2version"
+version = "1.{}.0"
+edition = "2018"
+description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
+license = "MPL-2.0"
+
+homepage = "https://github.com/rust-lang/rust-clippy"
+repository = "https://github.com/rust-lang/rust-clippy"
+readme = "README.md"
+keywords = ["version", "nightly", "rust"]
+categories = ["date-and-time", "no-std", "rust-patterns"]
+
+[dependencies]
+
+[features]
+default = ["std"]
+std = []
+
+[workspace]
+members = ["generate-versions"]
+"#, biggest_minor)).unwrap();
+    }
+
     Ok(())
 }
 
