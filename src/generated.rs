@@ -2,6 +2,7 @@
 #[inline]
 pub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static str> {
     match minor {
+        91 if patch == 1 => Ok(1762801323),
         91 => Ok(1761848974),
         90 => Ok(1758202281),
         9 => Ok(1464280168),
@@ -143,6 +144,7 @@ pub(crate) fn correlations_commits(
     match minor {
         11 if major == 0 => Ok("e1247cb1d0d681be034adb4b558b5a0c0d5720f9"),
         12 if major == 0 => Ok("f0c419429ef30723ceaf6b42f9b5a2aeb5d2e2d1"),
+        91 if patch == 1 => Ok("ccacefcdf16609dfd14ea052f2084e27fc906143"),
         91 => Ok("77e3cbafdd4034d5899ecb7fcf2d619bafb2d99c"),
         90 => Ok("d8401009a052a5efaed3f5c901c76dd733c04fbe"),
         9 => Ok("6f9526945c2b832c0eb2187964ecd68f6ab0f600"),
@@ -275,6 +277,7 @@ pub(crate) fn correlations_commits(
 #[inline]
 pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
     match minor {
+        91 if patch == 1 => true,
         91 if patch == 0 => true,
         90 if patch == 0 => true,
         9 if patch == 0 => true,
@@ -407,8 +410,9 @@ pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
     }
 }
 #[inline]
-pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 128] {
+pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 129] {
     [
+        ((1, 91, 1), 1762801323),
         ((1, 91, 0), 1761848974),
         ((1, 90, 0), 1758202281),
         ((1, 89, 0), 1754564102),
@@ -542,6 +546,7 @@ pub(crate) fn all_versions() -> [((u16, u16, u16), i64); 128] {
 #[inline]
 pub(crate) fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {
     match timestamp - 1 {
+        1761848974..1762801323 => Ok((1, 91, 1)),
         1758202281..1761848974 => Ok((1, 91, 0)),
         1754564102..1758202281 => Ok((1, 90, 0)),
         1750961413..1754564102 => Ok((1, 89, 0)),
