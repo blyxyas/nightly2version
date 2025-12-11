@@ -94,11 +94,11 @@ impl ToVersion for &[u8] {
     }
 }
 
-/// Return an static array of length `125` with the type structure `((MAJOR, MINOR, PATCH),
+/// Return an static array of length `130` with the type structure `((MAJOR, MINOR, PATCH),
 /// timestamp)`
 ///
 /// As always, the timestamp is in `i64` and starts from the [Unix Epoch](https://doc.rust-lang.org/stable/std/time/constant.UNIX_EPOCH.html)
-pub fn all_versions() -> [((u16, u16, u16), i64); 127] {
+pub fn all_versions() -> [((u16, u16, u16), i64); 130] {
     generated::all_versions()
 }
 
