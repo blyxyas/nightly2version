@@ -132,6 +132,9 @@ pub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static
         1 => Ok(1435253745),
         12 => Ok(1412872439),
         11 => Ok(1404324205),
+        92 => Ok(1765465099),
+        91 if patch == 1 => Ok(1762801323),
+        91 => Ok(1761848974),
         _ => Err("Version not found"),
     }
 }
@@ -273,6 +276,9 @@ pub(crate) fn correlations_commits(
         11 => Ok("f63a9c0cde3e69f0e283dd7dcd710a79a6869dee"),
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
+        92 => Ok("cbf451e10e2ed937b6a207461f3ab59f96bb1fc1"),
+        91 if patch == 1 => Ok("ccacefcdf16609dfd14ea052f2084e27fc906143"),
+        91 => Ok("77e3cbafdd4034d5899ecb7fcf2d619bafb2d99c"),
         _ => Err("Version not found"),
     }
 }
@@ -409,6 +415,9 @@ pub(crate) fn version_exists(minor: u16, patch: u16) -> bool {
         1 if patch == 0 => true,
         12 if patch == 0 => true,
         11 if patch == 0 => true,
+        92 if patch == 0 => true,
+        91 if patch == 1 => true,
+        91 if patch == 0 => true,
         _ => false,
     }
 }
