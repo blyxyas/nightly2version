@@ -136,7 +136,7 @@ impl RustVersion {
     /// error if it doesn't exist (likely because the version doesn't exist,
     /// or these isn't a commit tagged as the release; unlikely).
     #[inline(always)]
-    pub fn to_commit_id(&self) -> Result<&'static str, &'static str> {
+    pub const fn to_commit_id(&self) -> Result<&'static str, &'static str> {
         generated::correlations_commits(self.major, self.minor, self.patch)
     }
 
@@ -154,7 +154,7 @@ impl RustVersion {
     /// assert_eq!(RustVersion::new("1.101.9000").exists_in_stable(), false)
     /// # }
     /// ```
-    pub fn exists_in_stable(&self) -> bool {
+    pub const fn exists_in_stable(&self) -> bool {
         generated::version_exists(self.minor, self.patch)
     }
 

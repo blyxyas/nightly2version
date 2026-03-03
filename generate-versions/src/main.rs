@@ -36,7 +36,7 @@ fn main() -> Result<()> {
     generated_rs
         .write_all(b"#![allow(unreachable_patterns)]")
         .unwrap();
-    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static str> {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) const fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'static str> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -76,7 +76,7 @@ fn main() -> Result<()> {
 
     // COMMITS
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn correlations_commits(major: u16, minor: u16, patch: u16) -> Result<&'static str, &'static str> {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) const fn correlations_commits(major: u16, minor: u16, patch: u16) -> Result<&'static str, &'static str> {{\nmatch minor {{\n")?;
 
     repo.tag_foreach(|oid, bnames| {
         let tag = std::str::from_utf8(&bnames[10..]).unwrap();
@@ -121,7 +121,7 @@ fn main() -> Result<()> {
 
     // VERSIONS EXIST
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn version_exists(minor: u16, patch: u16) -> bool {{\nmatch minor {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) const fn version_exists(minor: u16, patch: u16) -> bool {{\nmatch minor {{\n")?;
 
     let mut how_many = 0;
     repo.tag_foreach(|_, bnames| {
@@ -153,7 +153,7 @@ fn main() -> Result<()> {
 
     writeln!(
         generated_rs,
-        "#[inline]\npub(crate) fn all_versions() -> [((u16, u16, u16), i64);{how_many}] {{\n["
+        "#[inline]\npub(crate) const fn all_versions() -> [((u16, u16, u16), i64);{how_many}] {{\n["
     )?;
 
     let mut meowmeowvec: Vec<((u32, u32, u32), i64)> = Vec::new();
@@ -205,7 +205,7 @@ fn main() -> Result<()> {
 
     // HASHMAP RANGES
 
-    writeln!(generated_rs, "#[inline]\npub(crate) fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {{\nmatch timestamp - 1 {{\n")?;
+    writeln!(generated_rs, "#[inline]\npub(crate) const fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {{\nmatch timestamp - 1 {{\n")?;
 
     let mut hashmap = HashMap::new();
 
