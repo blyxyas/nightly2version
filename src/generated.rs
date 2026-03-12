@@ -132,6 +132,7 @@ pub(crate) const fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'
         1 => Ok(1435253745),
         12 => Ok(1412872439),
         11 => Ok(1404324205),
+        94 => Ok(1772736247),
         93 if patch == 1 => Ok(1770928011),
         93 => Ok(1769089904),
         _ => Err("Version not found"),
@@ -275,6 +276,7 @@ pub(crate) const fn correlations_commits(
         11 => Ok("f63a9c0cde3e69f0e283dd7dcd710a79a6869dee"),
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
+        94 => Ok("5518e0609fc902e41fcdb470cb3adca7376759e3"),
         93 if patch == 1 => Ok("c302ead9bf59a71b35f3c28350574335b075808b"),
         93 => Ok("539f0812230e3e8b7b42bab0ec4317ae3750f568"),
         _ => Err("Version not found"),
@@ -413,14 +415,16 @@ pub(crate) const fn version_exists(minor: u16, patch: u16) -> bool {
         1 if patch == 0 => true,
         12 if patch == 0 => true,
         11 if patch == 0 => true,
+        94 if patch == 0 => true,
         93 if patch == 1 => true,
         93 if patch == 0 => true,
         _ => false,
     }
 }
 #[inline]
-pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 132] {
+pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 133] {
     [
+        ((1, 94, 0), 1772736247),
         ((1, 93, 1), 1770928011),
         ((1, 93, 0), 1769089904),
         ((1, 92, 0), 1765465099),
@@ -558,6 +562,7 @@ pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 132] {
 #[inline]
 pub(crate) const fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {
     match timestamp - 1 {
+        1770928011..1772736247 => Ok((1, 94, 0)),
         1769089904..1770928011 => Ok((1, 93, 1)),
         1765465099..1769089904 => Ok((1, 93, 0)),
         1762801323..1765465099 => Ok((1, 92, 0)),
