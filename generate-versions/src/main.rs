@@ -1,7 +1,12 @@
 use anyhow::Result;
 use git2::{self, Repository};
 use std::{
-    collections::HashMap, fs::OpenOptions, io::Write, path::Path, process::Command, str::FromStr,
+    collections::HashMap,
+    fs::OpenOptions,
+    io::{Read, Write},
+    path::Path,
+    process::Command,
+    str::FromStr,
 };
 use version::Version;
 
@@ -17,8 +22,6 @@ fn main() -> Result<()> {
     } else {
         repo = Repository::open(rust_path)?;
     }
-
-    repo.find_remote("origin")?.fetch(&["HEAD"], None, None)?;
 
     let mut generated_rs = OpenOptions::new()
         .write(true)
@@ -92,6 +95,7 @@ fn main() -> Result<()> {
         if version_parse.patch != 0 {
             meow.push_str(&format!("if patch == {}", version_parse.patch))
         }
+
         if version_parse.major == 0 {
             writeln!(
                 generated_rs,
@@ -150,6 +154,11 @@ fn main() -> Result<()> {
     arms.clear();
 
     // VERSIONS ARRAY
+
+    writeln!(
+        generated_rs,
+        "pub(crate) const ALL_VERSIONS_LENGTH: usize = 135;"
+    )?;
 
     writeln!(
         generated_rs,
@@ -279,6 +288,7 @@ fn main() -> Result<()> {
     writeln!(generated_rs, "}} }}").unwrap();
 
     format_with_fmt()?;
+
     Ok(())
 }
 

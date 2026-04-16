@@ -98,7 +98,8 @@ impl ToVersion for &[u8] {
 /// timestamp)`
 ///
 /// As always, the timestamp is in `i64` and starts from the [Unix Epoch](https://doc.rust-lang.org/stable/std/time/constant.UNIX_EPOCH.html)
-pub fn all_versions() -> [((u16, u16, u16), i64); 134] {
+pub const fn all_versions() -> [((u16, u16, u16), i64); generated::ALL_VERSIONS_LENGTH] {
+    //ID: all_versions
     generated::all_versions()
 }
 
