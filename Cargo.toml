@@ -1,12 +1,11 @@
 [package]
 name = "nightly2version"
-version = "1.95.0"
+version = "1.95.0-1"
 edition = "2018"
 description = "`#[no_std]` and fast crate a Rust version to a timestamp and vice-versa (along other things)"
 license = "MPL-2.0"
-
-homepage = "https://github.com/rust-lang/rust-clippy"
-repository = "https://github.com/rust-lang/rust-clippy"
+homepage = "https://git.disroot.org/blyxyas/nightly2version"
+repository = "https://git.disroot.org/blyxyas/nightly2version"
 readme = "README.md"
 keywords = ["version", "nightly", "rust"]
 categories = ["date-and-time", "no-std", "rust-patterns"]

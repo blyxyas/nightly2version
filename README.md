@@ -1,5 +1,7 @@
 # `nightly2version`
 
+We're migrating the current repository to [a self-hosted Forgejo instance](https://git.disroot.org/blyxyas/nightly2version)
+
 This is a very lightweight, as fast as constant-time / a single `match` statement, 0 deps, `#[no_std]`-compatible Rust crate destined to converting from a Rust version to a timestamp and vice-versa (Along other kinds of version-checking shenanigans)
 
 ```rust
