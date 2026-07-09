@@ -132,6 +132,9 @@ pub(crate) const fn correlations_dates(minor: u16, patch: u16) -> Result<i64, &'
         1 => Ok(1435253745),
         12 => Ok(1412872439),
         11 => Ok(1404324205),
+        97 => Ok(1783599909),
+        96 if patch == 1 => Ok(1782821933),
+        96 => Ok(1779990634),
         95 => Ok(1776343656),
         94 if patch == 1 => Ok(1774530191),
         94 => Ok(1772736247),
@@ -278,6 +281,9 @@ pub(crate) const fn correlations_commits(
         11 => Ok("f63a9c0cde3e69f0e283dd7dcd710a79a6869dee"),
         10 => Ok("d5678055c2bca22696e870f9103dc10aa6c35f41"),
         1 => Ok("bc3c16f09287e5545c1d3f76b7abd54f2eca868b"),
+        97 => Ok("eca4cdea45792600b4275e9d4c64fd827d575a24"),
+        96 if patch == 1 => Ok("a79e9036fa48216bebaccfacd330793f11352000"),
+        96 => Ok("4bbe10842669dda78dfd4968905cf16177be9842"),
         95 => Ok("60d4c03b1c63ee2d4046af32b9182b9600d28858"),
         94 if patch == 1 => Ok("4c540d92e07b57f8a961905e3c391feaa0a8cc95"),
         94 => Ok("5518e0609fc902e41fcdb470cb3adca7376759e3"),
@@ -419,6 +425,9 @@ pub(crate) const fn version_exists(minor: u16, patch: u16) -> bool {
         1 if patch == 0 => true,
         12 if patch == 0 => true,
         11 if patch == 0 => true,
+        97 if patch == 0 => true,
+        96 if patch == 1 => true,
+        96 if patch == 0 => true,
         95 if patch == 0 => true,
         94 if patch == 1 => true,
         94 if patch == 0 => true,
@@ -427,10 +436,13 @@ pub(crate) const fn version_exists(minor: u16, patch: u16) -> bool {
         _ => false,
     }
 }
-pub(crate) const ALL_VERSIONS_LENGTH: usize = 135;
+pub(crate) const ALL_VERSIONS_LENGTH: usize = 138;
 #[inline]
-pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 135] {
+pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 138] {
     [
+        ((1, 97, 0), 1783599909),
+        ((1, 96, 1), 1782821933),
+        ((1, 96, 0), 1779990634),
         ((1, 95, 0), 1776343656),
         ((1, 94, 1), 1774530191),
         ((1, 94, 0), 1772736247),
@@ -571,6 +583,9 @@ pub(crate) const fn all_versions() -> [((u16, u16, u16), i64); 135] {
 #[inline]
 pub(crate) const fn timestamp_ranges(timestamp: i64) -> Result<(u16, u16, u16), &'static str> {
     match timestamp - 1 {
+        1782821933..1783599909 => Ok((1, 97, 0)),
+        1779990634..1782821933 => Ok((1, 96, 1)),
+        1776343656..1779990634 => Ok((1, 96, 0)),
         1774530191..1776343656 => Ok((1, 95, 0)),
         1772736247..1774530191 => Ok((1, 94, 1)),
         1770928011..1772736247 => Ok((1, 94, 0)),
